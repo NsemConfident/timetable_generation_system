@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Models\BreakPeriod;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -25,7 +26,7 @@ class BreakPeriodController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('time_slot_id')->integer('time_slot_id', 1);
         if ($v->fails()) {

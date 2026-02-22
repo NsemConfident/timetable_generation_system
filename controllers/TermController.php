@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Models\Term;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -36,7 +37,7 @@ class TermController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('academic_year_id', 'name', 'start_date', 'end_date')
           ->integer('academic_year_id', 1);
@@ -57,7 +58,7 @@ class TermController
         if (!$item) {
             Response::notFound('Term not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('academic_year_id', 'name', 'start_date', 'end_date');
         if ($v->fails()) {

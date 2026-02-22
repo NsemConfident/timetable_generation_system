@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Models\Teacher;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -35,7 +36,7 @@ class TeacherController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name')->maxLength('name', 255);
         if (isset($input['email'])) {
@@ -58,7 +59,7 @@ class TeacherController
         if (!$item) {
             Response::notFound('Teacher not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         if (isset($input['name'])) {
             $v->maxLength('name', 255);
@@ -101,7 +102,7 @@ class TeacherController
         if (!$this->model->findById($id)) {
             Response::notFound('Teacher not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::inputWithArrays(['subject_ids']);
         $v = new Validator($input);
         $v->required('subject_ids');
         if ($v->fails()) {
@@ -129,7 +130,10 @@ class TeacherController
         if (!$this->model->findById($id)) {
             Response::notFound('Teacher not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
+        if (isset($input['slots']) && is_string($input['slots'])) {
+            $input['slots'] = json_decode($input['slots'], true) ?: [];
+        }
         $v = new Validator($input);
         $v->required('slots');
         if ($v->fails()) {

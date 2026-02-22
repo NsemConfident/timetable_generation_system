@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Models\TimeSlot;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -25,7 +26,7 @@ class TimeSlotController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name', 'start_time', 'end_time', 'slot_order')->integer('slot_order', 0);
         if ($v->fails()) {
@@ -45,7 +46,7 @@ class TimeSlotController
         if (!$item) {
             Response::notFound('Time slot not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name', 'start_time', 'end_time', 'slot_order');
         if ($v->fails()) {

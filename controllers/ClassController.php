@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Models\SchoolClass;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -37,7 +38,7 @@ class ClassController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('academic_year_id', 'term_id', 'name')
           ->integer('academic_year_id', 1)
@@ -60,7 +61,7 @@ class ClassController
         if (!$item) {
             Response::notFound('Class not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('academic_year_id', 'term_id', 'name');
         if ($v->fails()) {

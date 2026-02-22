@@ -2,8 +2,32 @@
 
 Base URL (XAMPP): `http://localhost/time_table_generation_system/timetable-api`
 
-All request/response bodies are JSON. Protected endpoints require header:  
+All **responses** are JSON. **Request body** can be either JSON or form (so you can test in Postman with both).
+
+Protected endpoints require header:  
 `Authorization: Bearer <token>`
+
+---
+
+## Testing with Postman
+
+The API accepts **both**:
+
+1. **JSON body**  
+   - In Postman: **Body** → **raw** → select **JSON**.  
+   - Set header `Content-Type: application/json` (Postman sets this when you choose JSON).  
+   - Send payload like: `{"email":"admin@school.local","password":"Admin@123"}`
+
+2. **Form data**  
+   - In Postman: **Body** → **x-www-form-urlencoded** or **form-data**.  
+   - Add key/value pairs (e.g. `email` = `admin@school.local`, `password` = `Admin@123`).  
+   - No need to set Content-Type; Postman sets it for form.
+
+**For protected routes:** add header **Authorization** = `Bearer <your-token>` (e.g. after login).
+
+**Arrays in form:**  
+- For a list like `subject_ids`, use either multiple form keys `subject_ids[]` = `1`, `subject_ids[]` = `2`, or a single key `subject_ids` = `1,2,3` (comma-separated).  
+- For nested data (e.g. `slots` in teacher availability), send that field as a **JSON string** in form, e.g. `slots` = `[{"school_day_id":1,"time_slot_id":1,"is_available":1}]`.
 
 ---
 

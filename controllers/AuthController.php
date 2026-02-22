@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Services\AuthService;
+use Utils\Request;
 use Utils\Response;
 
 class AuthController
@@ -18,14 +19,14 @@ class AuthController
 
     public function register(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $result = $this->authService->register($input);
         Response::success('Registration successful.', $result, 201);
     }
 
     public function login(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $result = $this->authService->login($input);
         Response::success('Login successful.', $result);
     }

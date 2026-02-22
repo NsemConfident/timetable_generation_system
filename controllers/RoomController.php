@@ -6,6 +6,7 @@ namespace Controllers;
 
 use Models\Room;
 use Models\TimetableEntry;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -38,7 +39,7 @@ class RoomController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name')->integer('capacity', 0);
         if ($v->fails()) {
@@ -58,7 +59,7 @@ class RoomController
         if (!$item) {
             Response::notFound('Room not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name');
         if (isset($input['capacity'])) {

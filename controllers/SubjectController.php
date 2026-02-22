@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Models\Subject;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -35,7 +36,7 @@ class SubjectController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name')->maxLength('name', 150)->maxLength('code', 20);
         if ($v->fails()) {
@@ -54,7 +55,7 @@ class SubjectController
         if (!$item) {
             Response::notFound('Subject not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name');
         if ($v->fails()) {

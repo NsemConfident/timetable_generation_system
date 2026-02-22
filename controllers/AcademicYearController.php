@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Models\AcademicYear;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -35,7 +36,7 @@ class AcademicYearController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name', 'start_date', 'end_date');
         if ($v->fails()) {
@@ -55,7 +56,7 @@ class AcademicYearController
         if (!$item) {
             Response::notFound('Academic year not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name', 'start_date', 'end_date');
         if ($v->fails()) {

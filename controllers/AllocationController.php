@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Models\ClassSubjectAllocation;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -34,7 +35,7 @@ class AllocationController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('class_id', 'subject_id', 'teacher_id', 'academic_year_id', 'term_id')
           ->integer('class_id', 1)
@@ -60,7 +61,7 @@ class AllocationController
         if (!$item) {
             Response::notFound('Allocation not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('class_id', 'subject_id', 'teacher_id', 'academic_year_id', 'term_id');
         if ($v->fails()) {

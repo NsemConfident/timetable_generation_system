@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Models\SchoolDay;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -25,7 +26,7 @@ class SchoolDayController
 
     public function store(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name', 'day_order')->integer('day_order', 0);
         if ($v->fails()) {
@@ -45,7 +46,7 @@ class SchoolDayController
         if (!$item) {
             Response::notFound('School day not found.');
         }
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('name', 'day_order')->integer('day_order', 0);
         if ($v->fails()) {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Controllers;
 
 use Services\TimetableService;
+use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
 
@@ -19,7 +20,7 @@ class TimetableController
 
     public function generate(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('term_id')->integer('term_id', 1);
         if ($v->fails()) {
@@ -55,7 +56,7 @@ class TimetableController
 
     public function swap(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('entry_id_1', 'entry_id_2')->integer('entry_id_1', 1)->integer('entry_id_2', 1);
         if ($v->fails()) {
@@ -67,7 +68,7 @@ class TimetableController
 
     public function move(): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?: [];
+        $input = Request::input();
         $v = new Validator($input);
         $v->required('entry_id', 'school_day_id', 'time_slot_id')
           ->integer('entry_id', 1)

@@ -132,7 +132,13 @@ class TeacherController
         }
         $input = Request::input();
         if (isset($input['slots']) && is_string($input['slots'])) {
-            $input['slots'] = json_decode($input['slots'], true) ?: [];
+            $decoded = json_decode($input['slots'], true);
+            if ($decoded === null && $input['slots'] !== '' && $input['slots'] !== 'null') {
+                Response::validationError('Validation failed.', [
+                    'slots' => ['slots must be valid JSON array.'],
+                ]);
+            }
+            $input['slots'] = is_array($decoded) ? $decoded : [];
         }
         $v = new Validator($input);
         $v->required('slots');

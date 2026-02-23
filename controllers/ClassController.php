@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Controllers;
 
+use Models\AcademicYear;
 use Models\SchoolClass;
+use Models\Term;
 use Utils\Request;
 use Utils\Response;
 use Utils\Validator;
@@ -50,21 +52,37 @@ class ClassController
         $data['academic_year_id'] = (int) $data['academic_year_id'];
         $data['term_id'] = (int) $data['term_id'];
         $data['name'] = trim((string) ($data['name'] ?? ''));
+        if ($data['name'] === '') {
+            Response::validationError('Validation failed.', ['name' => ['Class name is required and cannot be empty.']]);
+        }
+        $academicYear = (new AcademicYear())->findById($data['academic_year_id']);
+        $term = (new Term())->findById($data['term_id']);
+        if (!$academicYear) {
+            Response::validationError('Invalid academic year.', ['academic_year_id' => ['This academic year does not exist.']]);
+        }
+        if (!$term) {
+            Response::validationError('Invalid term.', ['term_id' => ['This term does not exist.']]);
+        }
+        if ((int) $term['academic_year_id'] !== (int) $data['academic_year_id']) {
+            Response::validationError('Term does not belong to the given academic year.', ['term_id' => ['This term belongs to a different academic year.']]);
+        }
         try {
             $id = $this->model->create($data);
         } catch (\PDOException $e) {
             $msg = $e->getMessage();
-            $code = (string) $e->getCode();
-            if ($code === '23000' || strpos($msg, 'foreign key') !== false || strpos($msg, '1452') !== false) {
+            if (strpos($msg, 'Duplicate entry') !== false || strpos($msg, '1062') !== false) {
+                Response::validationError('A class with this name may already exist for this term.', ['name' => ['Class name must be unique per term.']]);
+            }
+            if (strpos($msg, 'foreign key') !== false || strpos($msg, '1452') !== false || strpos($msg, 'Cannot add or update a child row') !== false) {
                 Response::validationError(
                     'Invalid academic year or term. Please ensure the academic year and term exist.',
                     ['academic_year_id' => ['Check that this academic year exists.'], 'term_id' => ['Check that this term exists and belongs to the academic year.']]
                 );
             }
-            if (strpos($msg, 'Duplicate entry') !== false || strpos($msg, '1062') !== false) {
-                Response::validationError('A class with this name may already exist for this term.', ['name' => ['Class name must be unique per term.']]);
+            if (stripos($msg, 'cannot be null') !== false || (stripos($msg, 'Column') !== false && stripos($msg, 'null') !== false)) {
+                Response::validationError('Invalid data. Please check all required fields are provided.', []);
             }
-            Response::error('Unable to create class. Please check academic year and term exist.', [], 422);
+            Response::error('Unable to create class. Please try again or check your data.', [], 422);
         }
         $item = $this->model->findById($id);
         Response::success('Class created.', ['class' => $item], 201);

@@ -57,6 +57,9 @@ try {
     if (strpos($url, 'api/') !== false) {
         $url = preg_replace('#^.*?(api/.*)$#', '$1', $url);
     }
+    if ($url !== '' && strpos($url, 'api/') !== 0) {
+        $url = 'api/' . ltrim($url, '/');
+    }
     $url = $url === '' ? '/' : '/' . $url;
 
     $routes = require __DIR__ . '/routes/api.php';

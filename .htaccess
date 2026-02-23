@@ -1,4 +1,6 @@
 RewriteEngine On
+# If the app lives in a subfolder, set RewriteBase to that path (no leading/trailing slash). Adjust if your URL differs.
+RewriteBase /time_table_generation_system/timetable-api/
 
 # Pass Authorization header to PHP (Apache often strips it with mod_rewrite/CGI)
 RewriteCond %{HTTP:Authorization} .

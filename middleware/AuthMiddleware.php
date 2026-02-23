@@ -16,11 +16,10 @@ class AuthMiddleware
 {
     public function handle(array $params): void
     {
-        $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
-        if ($header === '' || !preg_match('/^Bearer\s+(.+)$/i', trim($header), $m)) {
+        $token = $this->extractToken();
+        if ($token === '') {
             Response::unauthorized('Missing or invalid authorization token.');
         }
-        $token = trim($m[1]);
 
         $pdo = Database::getInstance()->getConnection();
         $stmt = $pdo->prepare(
@@ -38,5 +37,24 @@ class AuthMiddleware
         }
 
         RequestContext::setUser($user);
+    }
+
+    /**
+     * Extract Bearer token from Authorization header or X-Auth-Token (fallback when server strips Authorization).
+     */
+    private function extractToken(): string
+    {
+        $header = $_SERVER['HTTP_AUTHORIZATION']
+            ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+            ?? $_SERVER['HTTP_X_AUTH_TOKEN']
+            ?? '';
+        $header = trim((string) $header);
+        if ($header !== '' && preg_match('/^Bearer\s+(.+)$/i', $header, $m)) {
+            return trim($m[1]);
+        }
+        if ($header !== '' && !preg_match('/^Bearer\s+/i', $header)) {
+            return $header;
+        }
+        return '';
     }
 }

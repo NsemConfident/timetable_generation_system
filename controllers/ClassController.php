@@ -49,7 +49,23 @@ class ClassController
         $data = $v->getData();
         $data['academic_year_id'] = (int) $data['academic_year_id'];
         $data['term_id'] = (int) $data['term_id'];
-        $id = $this->model->create($data);
+        $data['name'] = trim((string) ($data['name'] ?? ''));
+        try {
+            $id = $this->model->create($data);
+        } catch (\PDOException $e) {
+            $msg = $e->getMessage();
+            $code = (string) $e->getCode();
+            if ($code === '23000' || strpos($msg, 'foreign key') !== false || strpos($msg, '1452') !== false) {
+                Response::validationError(
+                    'Invalid academic year or term. Please ensure the academic year and term exist.',
+                    ['academic_year_id' => ['Check that this academic year exists.'], 'term_id' => ['Check that this term exists and belongs to the academic year.']]
+                );
+            }
+            if (strpos($msg, 'Duplicate entry') !== false || strpos($msg, '1062') !== false) {
+                Response::validationError('A class with this name may already exist for this term.', ['name' => ['Class name must be unique per term.']]);
+            }
+            Response::error('Unable to create class. Please check academic year and term exist.', [], 422);
+        }
         $item = $this->model->findById($id);
         Response::success('Class created.', ['class' => $item], 201);
     }

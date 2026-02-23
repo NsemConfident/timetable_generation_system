@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Controllers;
 
+use Models\Subject;
 use Models\Teacher;
 use Utils\Request;
 use Utils\Response;
@@ -109,8 +110,19 @@ class TeacherController
             Response::validationError('Validation failed.', $v->getErrors());
         }
         $subjectIds = is_array($input['subject_ids']) ? array_map('intval', $input['subject_ids']) : [];
-        $this->model->setSubjects($id, $subjectIds);
-        $list = $this->model->getSubjects($id);
+        $subjectIds = array_values(array_unique(array_filter($subjectIds, fn($s) => $s > 0)));
+        $subjectModel = new Subject();
+        foreach ($subjectIds as $sid) {
+            if (!$subjectModel->findById($sid)) {
+                Response::validationError('One or more subject IDs do not exist.', ['subject_ids' => ["Subject ID {$sid} does not exist."]]);
+            }
+        }
+        try {
+            $this->model->setSubjects($id, $subjectIds);
+            $list = $this->model->getSubjects($id);
+        } catch (\PDOException $e) {
+            Response::error('Unable to assign subjects. Please check that all subject IDs exist.', [], 422);
+        }
         Response::success('Subjects assigned.', ['subjects' => $list]);
     }
 

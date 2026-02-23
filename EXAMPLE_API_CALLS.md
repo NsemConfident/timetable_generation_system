@@ -1,6 +1,7 @@
 # Timetable API – Example API Calls
 
-Base URL (XAMPP): `http://localhost/time_table_generation_system/timetable-api`
+Base URL (XAMPP): `http://localhost/time_table_generation_system/timetable-api`  
+(Note: use **timetable-api** with an “i”, not timetable-ap.)
 
 All **responses** are JSON. **Request body** can be either JSON or form (so you can test in Postman with both).
 

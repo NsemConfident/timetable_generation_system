@@ -54,6 +54,9 @@ spl_autoload_register(function (string $class): void {
 try {
     $url = $_GET['url'] ?? '';
     $url = rtrim($url, '/');
+    if (strpos($url, 'api/') !== false) {
+        $url = preg_replace('#^.*?(api/.*)$#', '$1', $url);
+    }
     $url = $url === '' ? '/' : '/' . $url;
 
     $routes = require __DIR__ . '/routes/api.php';

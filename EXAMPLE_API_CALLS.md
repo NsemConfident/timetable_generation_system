@@ -229,6 +229,40 @@ Returns `teacher_conflicts`, `room_conflicts`, `class_conflicts` (arrays of over
 
 ---
 
+## Assessment (CA/Exam) sessions and timetable
+
+### Sessions (CRUD)
+```http
+GET    /api/assessments?term_id=1&type=ca
+POST   /api/assessments   { "name": "Term 1 CA", "type": "ca", "term_id": 1, "academic_year_id": 1, "start_date": "2024-10-01", "end_date": "2024-10-15", "default_duration_minutes": 60 }
+GET    /api/assessments/1
+PUT    /api/assessments/1   { "name": "...", "type": "ca", "term_id": 1, "academic_year_id": 1, "start_date": "...", "end_date": "..." }
+DELETE /api/assessments/1
+```
+`type`: `ca` or `exam`.
+
+### Subjects in a session
+```http
+GET    /api/assessments/1/subjects
+POST   /api/assessments/1/subjects   { "items": [ { "class_id": 1, "subject_id": 1, "duration_minutes": 60, "supervisor_teacher_id": 2 }, ... ] }
+```
+Each item: `class_id`, `subject_id`, optional `duration_minutes`, optional `supervisor_teacher_id`.
+
+### Generate and list timetable
+```http
+POST   /api/assessments/1/generate
+GET    /api/assessments/1/timetable
+```
+Generation uses CAGenerator for `type=ca` (max 2 exams per class per day) or ExamGenerator for `type=exam`. Reuses school days, time slots, rooms, teacher availability.
+
+### Manual edit (swap / move)
+```http
+POST   /api/assessments/timetable/swap   { "entry_id_1": 10, "entry_id_2": 20 }
+POST   /api/assessments/timetable/move   { "entry_id": 10, "school_day_id": 2, "time_slot_id": 3, "room_id": 1 }
+```
+
+---
+
 ## Response format
 
 Success:

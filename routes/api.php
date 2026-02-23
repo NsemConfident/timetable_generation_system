@@ -114,4 +114,19 @@ return [
     ['pattern' => '/api/timetable/swap', 'methods' => ['POST'], 'handler' => ['Controllers\TimetableController', 'swap'], 'middleware' => $authMiddleware],
     ['pattern' => '/api/timetable/move', 'methods' => ['POST'], 'handler' => ['Controllers\TimetableController', 'move'], 'middleware' => $authMiddleware],
     ['pattern' => '/api/timetable/conflicts', 'methods' => ['GET'], 'handler' => ['Controllers\TimetableController', 'conflicts'], 'middleware' => $authMiddleware],
+
+    // -------------------------------------------------------------------------
+    // Assessment (CA/Exam) sessions and timetable
+    // -------------------------------------------------------------------------
+    ['pattern' => '/api/assessments', 'methods' => ['GET'], 'handler' => ['Controllers\AssessmentController', 'index'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments', 'methods' => ['POST'], 'handler' => ['Controllers\AssessmentController', 'store'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments/{id}/subjects', 'methods' => ['GET'], 'handler' => ['Controllers\AssessmentController', 'subjects'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments/{id}/subjects', 'methods' => ['POST'], 'handler' => ['Controllers\AssessmentController', 'addSubjects'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments/{id}/generate', 'methods' => ['POST'], 'handler' => ['Controllers\AssessmentController', 'generate'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments/{id}/timetable', 'methods' => ['GET'], 'handler' => ['Controllers\AssessmentController', 'timetable'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments/{id}', 'methods' => ['GET'], 'handler' => ['Controllers\AssessmentController', 'show'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments/{id}', 'methods' => ['PUT'], 'handler' => ['Controllers\AssessmentController', 'update'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments/{id}', 'methods' => ['DELETE'], 'handler' => ['Controllers\AssessmentController', 'destroy'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments/timetable/swap', 'methods' => ['POST'], 'handler' => ['Controllers\AssessmentController', 'swap'], 'middleware' => $authMiddleware],
+    ['pattern' => '/api/assessments/timetable/move', 'methods' => ['POST'], 'handler' => ['Controllers\AssessmentController', 'move'], 'middleware' => $authMiddleware],
 ];

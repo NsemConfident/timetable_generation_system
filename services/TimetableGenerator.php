@@ -88,6 +88,22 @@ class TimetableGenerator
             }
         }
 
+        $totalSlots = 0;
+        foreach ($this->daySlots as $slotList) {
+            $totalSlots += count($slotList);
+        }
+        if ($totalSlots === 0) {
+            Response::error(
+                'No available time slots. Add school days and time slots, and ensure not all slots are marked as break periods.'
+            );
+        }
+        if (empty($days)) {
+            Response::error('No school days defined. Add school days first (e.g. Monday–Friday).');
+        }
+        if (empty($slots)) {
+            Response::error('No time slots defined. Add time slots first (e.g. Period 1, Period 2, ...).');
+        }
+
         $this->demands = [];
         foreach ($allocations as $a) {
             $ppw = (int) ($a['periods_per_week'] ?? 1);
@@ -114,9 +130,10 @@ class TimetableGenerator
         $placed = [];
         $success = $this->backtrack(0, $placed, $roomIds);
         if (!$success) {
+            $totalNeeded = array_sum(array_column($this->demands, 'periods_per_week'));
             Response::error(
-                'Timetable generation failed: could not satisfy all constraints. ' .
-                'Check teacher availability, number of periods vs available slots, and allocations.'
+                'Timetable generation failed: could not place all periods. ' .
+                'Ensure you have: (1) school days and time slots (not all marked as breaks), (2) teachers with availability that allows scheduling, (3) enough free slots for ' . $totalNeeded . ' periods total.'
             );
         }
 
@@ -132,6 +149,11 @@ class TimetableGenerator
     private function backtrack(int $demandIndex, array &$placed, array $roomIds): bool
     {
         if ($demandIndex >= count($this->demands)) {
+            foreach ($this->periodsLeft as $left) {
+                if ($left > 0) {
+                    return false;
+                }
+            }
             return true;
         }
 

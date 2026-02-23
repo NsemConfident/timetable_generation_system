@@ -53,6 +53,7 @@ timetable-api/
 - **Time:** school-days, time-slots, break-periods
 - **Allocations:** `POST/GET /api/allocations`, `GET /api/allocations/class/{id}`
 - **Timetable:** `POST /api/timetable/generate`, `GET /api/timetable`, by class/teacher, swap, move, conflicts
+- **Assessment (CA/Exam):** CRUD `GET/POST/PUT/DELETE /api/assessments`, `GET/POST /api/assessments/{id}/subjects`, `POST /api/assessments/{id}/generate`, `GET /api/assessments/{id}/timetable`, swap, move
 
 All responses are JSON: `{ "success": true|false, "message": "...", "data": {} }`.  
 Protected routes require header: `Authorization: Bearer <token>`.
@@ -68,6 +69,8 @@ See **EXAMPLE_API_CALLS.md** for request/response examples.
 
 ## Timetable generation
 
-- **Service:** `Services\TimetableGenerator`
-- **Constraints:** one teacher per slot, one class per slot, one room per slot, teacher availability respected.
-- **Algorithm:** backtracking over allocations and slots; break periods are excluded from placement.
+- **Lesson timetable:** `Services\TimetableGenerator` — one teacher/class/room per slot, teacher availability, backtracking; break periods excluded.
+- **CA timetable:** `Services\CAGenerator` — max 2 exams per class per day, supervisor availability, no class/room clash; greedy + backtracking (longest duration first).
+- **Exam timetable:** `Services\ExamGenerator` — no same-class exam at same time, room not double-booked, optional supervisor; greedy + backtracking.
+
+Assessment tables: run `database/migrations_assessment.sql` if the DB already exists (or use full `migrations.sql` which includes them). See **ASSESSMENT_API_EXAMPLES.md** for Postman payloads and sample JSON.
